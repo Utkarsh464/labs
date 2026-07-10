@@ -1,4 +1,4 @@
-# VSFTPD 2.3.4 Backdoor Exploitation Lab
+# vsFTPd 2.3.4 Backdoor Exploitation Lab
 
 This lab documents exploitation of the vsFTPd 2.3.4 backdoor vulnerability in an isolated Metasploitable 2 environment. The activity was performed only against an intentionally vulnerable virtual machine for educational purposes.
 
@@ -98,7 +98,7 @@ exploit/unix/ftp/vsftpd_234_backdoor
 
 ## Vulnerability Identification
 
-The identified service was `vsftpd 2.3.4`, which is associated with CVE-2011-2523. This vulnerability was not a normal feature bug in vsFTPd. It came from a maliciously modified source archive that introduced a backdoor into the `vsftpd-2.3.4.tar.gz` distribution.
+The identified service was `vsftpd 2.3.4`, which is associated with CVE-2011-2523. This vulnerability was not caused by a conventional programming flaw in upstream vsFTPd. It came from a maliciously modified source archive that introduced a backdoor into the `vsftpd-2.3.4.tar.gz` distribution.
 
 According to NVD, affected downloads of vsFTPd 2.3.4 contained a backdoor that opened a shell on `6200/tcp`. Rapid7's Metasploit module documentation notes that the malicious archive was introduced between June 30, 2011 and July 1, 2011, and removed on July 3, 2011.
 
@@ -153,10 +153,10 @@ The first mistake was entering `RHOST 192.168.122.229` as if it were a command:
 [-] Unknown command: RHOST.
 ```
 
-The correct syntax is to use `set`:
+The immediate syntax fix was to use `set`. For this module, the final target setting should use `RHOSTS`, which is the option shown by `show options`:
 
 ```text
-set RHOST 192.168.122.229
+set RHOSTS 192.168.122.229
 ```
 
 The next run failed because `LHOST` was not set:
