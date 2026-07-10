@@ -38,6 +38,10 @@ Identify the vulnerable FTP service on Metasploitable 2, exploit CVE-2011-2523 w
 | 3 | [Successful Meterpreter session](screenshots/03-vsftpd-forceexploit-meterpreter-session.png) | Forced exploit attempt resulting in a Meterpreter session. |
 | 4 | [Root shell validation](screenshots/04-meterpreter-root-shell-validation.png) | Interactive shell validation with `whoami` and `uname -a`. |
 
+## Command Reference
+
+- [Detailed command notes](notes/commands.md)
+
 ## Enumeration
 
 ### Nmap Scan
