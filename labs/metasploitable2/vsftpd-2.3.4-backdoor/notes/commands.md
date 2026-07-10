@@ -1,4 +1,4 @@
-# VSFTPD 2.3.4 Backdoor Command Reference
+# vsFTPd 2.3.4 Backdoor Command Reference
 
 This file records the commands used during the lab, what each command does, the expected output, and troubleshooting notes. The lab was performed only against Metasploitable 2 on an isolated virtual network.
 
