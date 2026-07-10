@@ -41,6 +41,7 @@ Identify the vulnerable FTP service on Metasploitable 2, exploit CVE-2011-2523 w
 ## Command Reference
 
 - [Detailed command notes](notes/commands.md)
+- [Metasploit setup resource](commands/metasploit-vsftpd-setup.rc)
 
 ## Enumeration
 
