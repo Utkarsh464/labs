@@ -4,7 +4,7 @@
 [![Labs](https://img.shields.io/badge/labs-2-blue)](#lab-index)
 [![Target](https://img.shields.io/badge/target-Metasploitable%202-critical)](machines/metasploitable2/)
 
-Hands-on penetration testing labs documenting real exploitation workflows against intentionally vulnerable machines.
+I built this lab environment to practice the full penetration testing workflow in a controlled, isolated network. Every lab here documents what I found, what broke, and what I learned — from initial recon through post-exploitation validation — against Metasploitable 2.
 
 > All activity was performed in an isolated lab environment for educational purposes.
 
@@ -19,32 +19,56 @@ Hands-on penetration testing labs documenting real exploitation workflows agains
 
 ---
 
+## Methodology
+
+Every lab follows the same five-phase workflow:
+
+| Phase | My Approach |
+|---|---|
+| **Reconnaissance** | Nmap/Zenmap service discovery, port scanning, OS fingerprinting. Identify every open port and banner before choosing a target. |
+| **Enumeration** | Version-to-CVE mapping. Research the specific service version, review exploit behavior, and identify prerequisites — LHOST reachability, session cookies, module quirks. |
+| **Exploitation** | Configure and run the exploit. When it breaks — and it will — troubleshoot methodically: verify the network path, check module options, read the error output. |
+| **Post-Exploitation** | Validate access level (whoami, id, uname -a), navigate the filesystem, capture evidence. A shell is not the end; confirming what you have is. |
+| **Remediation** | Map findings to actionable controls: version upgrades, configuration hardening, network segmentation, detection rules. |
+
+---
+
 ## Featured Labs
 
 ### vsFTPd 2.3.4 Backdoor
 
-This lab identifies `vsftpd 2.3.4` on Metasploitable 2, maps it to CVE-2011-2523, troubleshoots failed reverse callback behavior, and validates a root shell through Meterpreter.
+Found `vsftpd 2.3.4` on port 21 during an Nmap scan. Mapped it to CVE-2011-2523 and selected the Metasploit module. The first few attempts failed because I set the wrong `LHOST` — the target couldn't route back to my listener. After fixing the address and enabling `ForceExploit` to bypass a stale port-6200 check, I landed a root Meterpreter shell. The troubleshooting (wrong LHOST, ForceExploit flag) taught me more about how reverse payloads actually work than a clean exploit ever would have.
 
 [Full writeup →](machines/metasploitable2/vsftpd-2.3.4-backdoor/README.md)
 
 | Evidence | Description |
 | --- | --- |
-| ![Zenmap service scan](machines/metasploitable2/vsftpd-2.3.4-backdoor/screenshots/01-zenmap-service-scan.png) | Nmap/Zenmap service discovery showing `vsftpd 2.3.4` on `21/tcp`. |
-| ![Metasploit module options](machines/metasploitable2/vsftpd-2.3.4-backdoor/screenshots/02-metasploit-vsftpd-module-options.png) | Module search, selection, and required options. |
-| ![Meterpreter session](machines/metasploitable2/vsftpd-2.3.4-backdoor/screenshots/03-vsftpd-forceexploit-meterpreter-session.png) | Successful exploit after ForceExploit troubleshooting. |
-| ![Root shell validation](machines/metasploitable2/vsftpd-2.3.4-backdoor/screenshots/04-meterpreter-root-shell-validation.png) | `whoami` and `uname -a` from interactive shell. |
+| ![Zenmap service scan](machines/metasploitable2/vsftpd-2.3.4-backdoor/screenshots/01-zenmap-service-scan.png) | Nmap scan that first identified vsftpd 2.3.4 on 21/tcp. |
+| ![Metasploit module options](machines/metasploitable2/vsftpd-2.3.4-backdoor/screenshots/02-metasploit-vsftpd-module-options.png) | Module options I configured before the exploit. |
+| ![Meterpreter session](machines/metasploitable2/vsftpd-2.3.4-backdoor/screenshots/03-vsftpd-forceexploit-meterpreter-session.png) | Meterpreter session after fixing LHOST and enabling ForceExploit. |
+| ![Root shell validation](machines/metasploitable2/vsftpd-2.3.4-backdoor/screenshots/04-meterpreter-root-shell-validation.png) | Post-exploit validation — whoami and uname -a confirmed root. |
 
 ### DVWA Brute Force
 
-A brute-force attack against the Damn Vulnerable Web Application (DVWA) login page using Hydra. Demonstrates weak credential discovery, session cookie injection, and the impact of missing rate-limiting controls.
+A Hydra brute-force against the DVWA login page. The admin account still used `password` as its credential. The key learning was the session cookie — without injecting the `PHPSESSID` header into Hydra's request, every attempt redirects to the login page regardless of credential correctness. I also ran an 18.6-million-entry wordlist, hit ~2,188 attempts/minute, and calculated it would take 6 days to complete. That taught me to always start with a smaller, targeted list.
 
 [Full writeup →](machines/metasploitable2/dvwa-brute-force/README.md)
 
 | Evidence | Description |
 | --- | --- |
-| ![DVWA successful login](machines/metasploitable2/dvwa-brute-force/screenshots/01-dvwa-brute-force-successful-login.png) | DVWA Brute Force page showing successful `admin:password` login. |
-| ![Hydra session](machines/metasploitable2/dvwa-brute-force/screenshots/02-hydra-brute-force-session.png) | Full hydra sequence: single-password test, wordlist run, and result. |
-| ![Nmap scan](machines/metasploitable2/dvwa-brute-force/screenshots/03-nmap-recon-and-hydra-results.png) | Nmap service scan of target alongside hydra output. |
+| ![DVWA successful login](machines/metasploitable2/dvwa-brute-force/screenshots/01-dvwa-brute-force-successful-login.png) | Successful admin:password login after Hydra brute-force. |
+| ![Hydra session](machines/metasploitable2/dvwa-brute-force/screenshots/02-hydra-brute-force-session.png) | Full Hydra session — single-password test, wordlist run, and result. |
+| ![Nmap scan](machines/metasploitable2/dvwa-brute-force/screenshots/03-nmap-recon-and-hydra-results.png) | Nmap recon alongside Hydra output. |
+
+---
+
+## What I Learned
+
+- **Wrong `LHOST` is the most common failure.** Reverse payloads fail silently if the target can't reach your listener. Always verify network path before running an exploit.
+- **Session cookies are everything in web app testing.** Without injecting the `PHPSESSID`, every brute-force attempt hits a login redirect — valid credentials or not.
+- **`ForceExploit` bypasses a safety check, not a technical barrier.** It worked here because I had already confirmed the target was vulnerable. In a real engagement, dig deeper rather than force it.
+- **Wordlist size is a time budget.** 18.6 million entries at 2,188 tries/min is ~6 days. Start small, confirm syntax, then scale.
+- **Troubleshooting failures teaches more than clean successes.** The wrong-LHOST error, the stale port-6200 check, the redirect without a cookie — each of these forced me to understand what the tools were actually doing.
 
 ---
 
@@ -64,24 +88,15 @@ labs/
 
 ---
 
-## Lab Environment
+## Lab Topology
 
-- **Attacker:** Linux penetration testing workstation
-- **Target:** Metasploitable 2
-- **Network:** Isolated `192.168.122.0/24` virtual network
-- **Tools:** Nmap, Zenmap, Metasploit Framework, Meterpreter, Hydra, Netcat
+| Node | Role | Address |
+|---|---|---|
+| Linux pentest workstation | Attacker | `192.168.122.1` |
+| Metasploitable 2 | Target | `192.168.122.229` |
+| Virtual network | Isolated NAT | `192.168.122.0/24` |
 
----
-
-## Skills Demonstrated
-
-- Network and service enumeration with Nmap
-- Version-based vulnerability identification
-- Metasploit module selection, configuration, and troubleshooting
-- Web application brute-forcing with Hydra
-- Session cookie injection for authenticated testing
-- Post-exploitation validation (filesystem access, privilege verification)
-- Professional lab documentation and Git workflow
+**Tools:** Nmap, Zenmap, Metasploit Framework, Meterpreter, Hydra, Netcat
 
 ---
 
