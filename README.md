@@ -1,10 +1,10 @@
 # Security Labs
 
 [![License](https://img.shields.io/github/license/Utkarsh464/labs)](LICENSE)
-[![Labs](https://img.shields.io/badge/labs-2-blue)](#lab-index)
+[![Labs](https://img.shields.io/badge/labs-3-blue)](#lab-index)
 [![Target](https://img.shields.io/badge/target-Metasploitable%202-critical)](machines/metasploitable2/)
 
-I built this lab environment to practice the full penetration testing workflow in a controlled, isolated network. Every lab here documents what I found, what broke, and what I learned — from initial recon through post-exploitation validation — against Metasploitable 2.
+I built this lab environment to practice penetration testing and web application security workflows in a controlled, isolated network. Every lab here documents what I found, what broke, and what I learned against Metasploitable 2.
 
 > All activity was performed in an isolated lab environment for educational purposes.
 
@@ -16,12 +16,13 @@ I built this lab environment to practice the full penetration testing workflow i
 | --- | --- | --- | --- |
 | [vsFTPd 2.3.4 Backdoor](machines/metasploitable2/vsftpd-2.3.4-backdoor/README.md) | Metasploitable 2 | Metasploit — CVE-2011-2523 | Complete |
 | [DVWA Brute Force](machines/metasploitable2/dvwa-brute-force/README.md) | Metasploitable 2 | Hydra — HTTP form brute-force | Complete |
+| [DVWA Reflected XSS](machines/metasploitable2/dvwa-reflected-xss/README.md) | Metasploitable 2 | Reflected XSS — blacklist bypass | Complete |
 
 ---
 
 ## Methodology
 
-Every lab follows the same five-phase workflow:
+Labs follow the same core workflow, adapted to the target and vulnerability:
 
 | Phase | My Approach |
 |---|---|
@@ -60,12 +61,27 @@ A Hydra brute-force against the DVWA login page. The admin account still used `p
 | ![Hydra session](machines/metasploitable2/dvwa-brute-force/screenshots/02-hydra-brute-force-session.png) | Full Hydra session — single-password test, wordlist run, and result. |
 | ![Nmap scan](machines/metasploitable2/dvwa-brute-force/screenshots/03-nmap-recon-and-hydra-results.png) | Nmap recon alongside Hydra output. |
 
+### DVWA Reflected XSS
+
+A source-code-driven review of DVWA's Reflected XSS module across Low, Medium, and High security levels. The Low level reflected raw HTML directly into the page, while the Medium level tried to remove only the exact lowercase `<script>` string with `str_replace()`. The bypass worked because HTML tag names are case-insensitive, so Firefox treated uppercase `<SCRIPT>` as a valid script tag. The High level showed the correct defensive pattern: output encoding with `htmlspecialchars()`.
+
+[Full writeup →](machines/metasploitable2/dvwa-reflected-xss/README.md)
+
+| Evidence | Description |
+| --- | --- |
+| ![Low source code](machines/metasploitable2/dvwa-reflected-xss/screenshots/reflected-xss-low-source-code.png) | Low security source code directly reflecting the `name` parameter. |
+| ![Low HTML injection](machines/metasploitable2/dvwa-reflected-xss/screenshots/reflected-xss-low-html-injection.png) | Browser rendering user-controlled `<b>` tags as HTML. |
+| ![Medium source code](machines/metasploitable2/dvwa-reflected-xss/screenshots/reflected-xss-medium-source-code.png) | Medium security source code using a case-sensitive blacklist. |
+| ![Medium successful XSS](machines/metasploitable2/dvwa-reflected-xss/screenshots/reflected-xss-medium-success.png) | Uppercase `<SCRIPT>` bypass resulting in JavaScript execution. |
+
 ---
 
 ## What I Learned
 
 - **Wrong `LHOST` is the most common failure.** Reverse payloads fail silently if the target can't reach your listener. Always verify network path before running an exploit.
 - **Session cookies are everything in web app testing.** Without injecting the `PHPSESSID`, every brute-force attempt hits a login redirect — valid credentials or not.
+- **Blacklist filtering does not solve XSS.** The Medium DVWA filter removed only lowercase `<script>`, but browser parsing still accepted uppercase `<SCRIPT>`.
+- **Output encoding changes the browser's interpretation.** `htmlspecialchars()` worked because user input stayed text instead of becoming markup.
 - **`ForceExploit` bypasses a safety check, not a technical barrier.** It worked here because I had already confirmed the target was vulnerable. In a real engagement, dig deeper rather than force it.
 - **Wordlist size is a time budget.** 18.6 million entries at 2,188 tries/min is ~6 days. Start small, confirm syntax, then scale.
 - **Troubleshooting failures teaches more than clean successes.** The wrong-LHOST error, the stale port-6200 check, the redirect without a cookie — each of these forced me to understand what the tools were actually doing.
@@ -80,7 +96,8 @@ labs/
 │   └── metasploitable2/
 │       ├── README.md
 │       ├── vsftpd-2.3.4-backdoor/
-│       └── dvwa-brute-force/
+│       ├── dvwa-brute-force/
+│       └── dvwa-reflected-xss/
 ├── .gitignore
 ├── LICENSE
 └── README.md
@@ -96,7 +113,7 @@ labs/
 | Metasploitable 2 | Target | `192.168.122.229` |
 | Virtual network | Isolated NAT | `192.168.122.0/24` |
 
-**Tools:** Nmap, Zenmap, Metasploit Framework, Meterpreter, Hydra, Netcat
+**Tools:** Nmap, Zenmap, Metasploit Framework, Meterpreter, Hydra, Netcat, Firefox
 
 ---
 
@@ -106,6 +123,7 @@ labs/
 - [Hydra](https://github.com/vanhauser-thc/thc-hydra)
 - [Nmap](https://nmap.org/)
 - [Netcat](https://nc110.sourceforge.io/)
+- [Firefox](https://www.mozilla.org/firefox/)
 - [Metasploitable 2](https://docs.rapid7.com/metasploit/metasploitable-2/)
 - [DVWA](https://github.com/digininja/DVWA)
 

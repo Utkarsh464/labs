@@ -35,7 +35,7 @@ The lab consisted of two virtual machines on an isolated `192.168.122.0/24` netw
 
 DVWA was accessed at:
 
-```
+```text
 http://192.168.122.229/dvwa/
 ```
 
@@ -83,7 +83,7 @@ Navigating to the DVWA Brute Force vulnerability page revealed a simple login fo
 
 The form issues an HTTP GET request to:
 
-```
+```text
 /dvwa/vulnerabilities/brute/
 ```
 
@@ -93,7 +93,7 @@ with the parameters `username`, `password`, and `Login` sent as query string par
 
 An incorrect login attempt returns the message:
 
-```
+```text
 Username and/or password incorrect
 ```
 
@@ -169,7 +169,7 @@ F=Username and/or password incorrect"
 
 Hydra reported:
 
-```
+```text
 [DATA] max 16 tasks per 1 server, overall 16 tasks, 18654036 login tries
 [STATUS] 2188.00 tries/min, 6564 tries in 00:03h, 18731186 to do in 142:41h
 ```
@@ -182,7 +182,7 @@ At the observed rate of approximately 2,188 attempts per minute, completing all 
 
 After Hydra reported the discovered credentials, they were manually verified by logging into the DVWA Brute Force page. The application responded with:
 
-```
+```text
 Welcome to the password protected area admin
 ```
 
@@ -245,6 +245,6 @@ Because Metasploitable 2 is an intentionally vulnerable machine, this represents
 
 - [Hydra GitHub Repository](https://github.com/vanhauser-thc/thc-hydra)
 - [DVWA Project](https://github.com/digininja/DVWA)
-- [OWASP Testing for Brute Force](https://owasp.org/www-project-web-security-testing-guide/stable/4-Web_Application_Security_Testing/04-Authentication_Testing/04-Testing_for_Brute_Force_Vulnerability)
+- [OWASP Testing for Weak Lock Out Mechanism](https://owasp.org/www-project-web-security-testing-guide/stable/4-Web_Application_Security_Testing/04-Authentication_Testing/03-Testing_for_Weak_Lock_Out_Mechanism)
 - [Metasploitable 2 Download](https://sourceforge.net/projects/metasploitable/)
 - [NIST SP 800-63B — Authentication Lifecycle](https://pages.nist.gov/800-63-3/sp800-63b.html)
