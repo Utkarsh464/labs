@@ -4,7 +4,7 @@
 [![Labs](https://img.shields.io/badge/labs-3-blue)](#lab-index)
 [![Target](https://img.shields.io/badge/target-Metasploitable%202-critical)](machines/metasploitable2/)
 
-I built this lab environment to practice penetration testing and web application security workflows in a controlled, isolated network. Every lab here documents what I found, what broke, and what I learned against Metasploitable 2.
+I built this lab environment to practice penetration testing and web application security workflows in a controlled, isolated network. Every lab here documents what I found, what broke, and what I learned across Metasploitable 2 and DVWA.
 
 > All activity was performed in an isolated lab environment for educational purposes.
 
@@ -15,8 +15,8 @@ I built this lab environment to practice penetration testing and web application
 | Lab | Target | Technique | Status |
 | --- | --- | --- | --- |
 | [vsFTPd 2.3.4 Backdoor](machines/metasploitable2/vsftpd-2.3.4-backdoor/README.md) | Metasploitable 2 | Metasploit — CVE-2011-2523 | Complete |
-| [DVWA Brute Force](machines/metasploitable2/dvwa-brute-force/README.md) | Metasploitable 2 | Hydra — HTTP form brute-force | Complete |
-| [DVWA Reflected XSS](machines/metasploitable2/dvwa-reflected-xss/README.md) | Metasploitable 2 | Reflected XSS — blacklist bypass | Complete |
+| [DVWA Brute Force](web-apps/dvwa/dvwa-brute-force/README.md) | DVWA on Metasploitable 2 | Hydra — HTTP form brute-force | Complete |
+| [DVWA Reflected XSS](web-apps/dvwa/dvwa-reflected-xss/README.md) | DVWA on Metasploitable 2 | Reflected XSS — blacklist bypass | Complete |
 
 ---
 
@@ -53,26 +53,26 @@ Found `vsftpd 2.3.4` on port 21 during an Nmap scan. Mapped it to CVE-2011-2523 
 
 A Hydra brute-force against the DVWA login page. The admin account still used `password` as its credential. The key learning was the session cookie — without injecting the `PHPSESSID` header into Hydra's request, every attempt redirects to the login page regardless of credential correctness. I also ran an 18.6-million-entry wordlist, hit ~2,188 attempts/minute, and calculated it would take 6 days to complete. That taught me to always start with a smaller, targeted list.
 
-[Full writeup →](machines/metasploitable2/dvwa-brute-force/README.md)
+[Full writeup →](web-apps/dvwa/dvwa-brute-force/README.md)
 
 | Evidence | Description |
 | --- | --- |
-| ![DVWA successful login](machines/metasploitable2/dvwa-brute-force/screenshots/01-dvwa-brute-force-successful-login.png) | Successful admin:password login after Hydra brute-force. |
-| ![Hydra session](machines/metasploitable2/dvwa-brute-force/screenshots/02-hydra-brute-force-session.png) | Full Hydra session — single-password test, wordlist run, and result. |
-| ![Nmap scan](machines/metasploitable2/dvwa-brute-force/screenshots/03-nmap-recon-and-hydra-results.png) | Nmap recon alongside Hydra output. |
+| ![DVWA successful login](web-apps/dvwa/dvwa-brute-force/screenshots/01-dvwa-brute-force-successful-login.png) | Successful admin:password login after Hydra brute-force. |
+| ![Hydra session](web-apps/dvwa/dvwa-brute-force/screenshots/02-hydra-brute-force-session.png) | Full Hydra session — single-password test, wordlist run, and result. |
+| ![Nmap scan](web-apps/dvwa/dvwa-brute-force/screenshots/03-nmap-recon-and-hydra-results.png) | Nmap recon alongside Hydra output. |
 
 ### DVWA Reflected XSS
 
 A source-code-driven review of DVWA's Reflected XSS module across Low, Medium, and High security levels. The Low level reflected raw HTML directly into the page, while the Medium level tried to remove only the exact lowercase `<script>` string with `str_replace()`. The bypass worked because HTML tag names are case-insensitive, so Firefox treated uppercase `<SCRIPT>` as a valid script tag. The High level showed the correct defensive pattern: output encoding with `htmlspecialchars()`.
 
-[Full writeup →](machines/metasploitable2/dvwa-reflected-xss/README.md)
+[Full writeup →](web-apps/dvwa/dvwa-reflected-xss/README.md)
 
 | Evidence | Description |
 | --- | --- |
-| ![Low source code](machines/metasploitable2/dvwa-reflected-xss/screenshots/reflected-xss-low-source-code.png) | Low security source code directly reflecting the `name` parameter. |
-| ![Low HTML injection](machines/metasploitable2/dvwa-reflected-xss/screenshots/reflected-xss-low-html-injection.png) | Browser rendering user-controlled `<b>` tags as HTML. |
-| ![Medium source code](machines/metasploitable2/dvwa-reflected-xss/screenshots/reflected-xss-medium-source-code.png) | Medium security source code using a case-sensitive blacklist. |
-| ![Medium successful XSS](machines/metasploitable2/dvwa-reflected-xss/screenshots/reflected-xss-medium-success.png) | Uppercase `<SCRIPT>` bypass resulting in JavaScript execution. |
+| ![Low source code](web-apps/dvwa/dvwa-reflected-xss/screenshots/reflected-xss-low-source-code.png) | Low security source code directly reflecting the `name` parameter. |
+| ![Low HTML injection](web-apps/dvwa/dvwa-reflected-xss/screenshots/reflected-xss-low-html-injection.png) | Browser rendering user-controlled `<b>` tags as HTML. |
+| ![Medium source code](web-apps/dvwa/dvwa-reflected-xss/screenshots/reflected-xss-medium-source-code.png) | Medium security source code using a case-sensitive blacklist. |
+| ![Medium successful XSS](web-apps/dvwa/dvwa-reflected-xss/screenshots/reflected-xss-medium-success.png) | Uppercase `<SCRIPT>` bypass resulting in JavaScript execution. |
 
 ---
 
@@ -95,7 +95,9 @@ labs/
 ├── machines/
 │   └── metasploitable2/
 │       ├── README.md
-│       ├── vsftpd-2.3.4-backdoor/
+│       └── vsftpd-2.3.4-backdoor/
+├── web-apps/
+│   └── dvwa/
 │       ├── dvwa-brute-force/
 │       └── dvwa-reflected-xss/
 ├── .gitignore
