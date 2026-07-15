@@ -12,10 +12,12 @@ Nmap `-A` against `192.168.122.229`: FTP (vsftpd 2.3.4), SSH (OpenSSH 4.7p1), Te
 |---|---|---|
 | vsftpd 2.3.4 | [vsFTPd Backdoor](vsftpd-2.3.4-backdoor/) | CVE-2011-2523 — supply-chain backdoor |
 | HTTP (DVWA) | [DVWA Brute Force](dvwa-brute-force/) | Weak credentials, no rate-limiting |
+| HTTP (DVWA) | [DVWA Reflected XSS](dvwa-reflected-xss/) | Reflected XSS, unsafe output handling |
 
 ## What I Learned
 
 - The same IP that gave root through the FTP backdoor also served default credentials on the web app. One host, multiple independent exploitation paths.
+- DVWA's security levels are useful for comparing weak filtering with proper output encoding in the same application flow.
 - Filtering 12+ services down to the one relevant finding is the skill that matters — it carries to any target, not just this VM.
 - Old CVEs follow the same workflow as modern ones: recon, version match, payload configure, troubleshoot, validate.
 
@@ -25,6 +27,7 @@ Nmap `-A` against `192.168.122.229`: FTP (vsftpd 2.3.4), SSH (OpenSSH 4.7p1), Te
 |---|---|---|---|
 | [vsFTPd 2.3.4 Backdoor](vsftpd-2.3.4-backdoor/) | FTP | CVE-2011-2523 | Complete |
 | [DVWA Brute Force](dvwa-brute-force/) | HTTP | Weak credentials | Complete |
+| [DVWA Reflected XSS](dvwa-reflected-xss/) | HTTP | Reflected XSS | Complete |
 
 ## Safety Boundary
 
