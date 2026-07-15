@@ -11,8 +11,8 @@ Nmap `-A` against `192.168.122.229`: FTP (vsftpd 2.3.4), SSH (OpenSSH 4.7p1), Te
 | Service | Lab | Vulnerability |
 |---|---|---|
 | vsftpd 2.3.4 | [vsFTPd Backdoor](vsftpd-2.3.4-backdoor/) | CVE-2011-2523 — supply-chain backdoor |
-| HTTP (DVWA) | [DVWA Brute Force](dvwa-brute-force/) | Weak credentials, no rate-limiting |
-| HTTP (DVWA) | [DVWA Reflected XSS](dvwa-reflected-xss/) | Reflected XSS, unsafe output handling |
+| HTTP (DVWA) | [DVWA Brute Force](../../web-apps/dvwa/dvwa-brute-force/) | Weak credentials, no rate-limiting |
+| HTTP (DVWA) | [DVWA Reflected XSS](../../web-apps/dvwa/dvwa-reflected-xss/) | Reflected XSS, unsafe output handling |
 
 ## What I Learned
 
@@ -26,8 +26,8 @@ Nmap `-A` against `192.168.122.229`: FTP (vsftpd 2.3.4), SSH (OpenSSH 4.7p1), Te
 | Lab | Service | Vulnerability | Status |
 |---|---|---|---|
 | [vsFTPd 2.3.4 Backdoor](vsftpd-2.3.4-backdoor/) | FTP | CVE-2011-2523 | Complete |
-| [DVWA Brute Force](dvwa-brute-force/) | HTTP | Weak credentials | Complete |
-| [DVWA Reflected XSS](dvwa-reflected-xss/) | HTTP | Reflected XSS | Complete |
+| [DVWA Brute Force](../../web-apps/dvwa/dvwa-brute-force/) | HTTP | Weak credentials | Complete |
+| [DVWA Reflected XSS](../../web-apps/dvwa/dvwa-reflected-xss/) | HTTP | Reflected XSS | Complete |
 
 ## Safety Boundary
 
