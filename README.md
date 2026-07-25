@@ -1,10 +1,10 @@
 # Security Labs
 
 [![License](https://img.shields.io/github/license/Utkarsh464/labs)](LICENSE)
-[![Labs](https://img.shields.io/badge/labs-3-blue)](#lab-index)
-[![Target](https://img.shields.io/badge/target-Metasploitable%202-critical)](machines/metasploitable2/)
+[![Labs](https://img.shields.io/badge/labs-4-blue)](#lab-index)
+[![Target](https://img.shields.io/badge/target-Metasploitable%202%20%7C%20WebGoat-critical)](machines/metasploitable2/)
 
-I built this lab environment to practice penetration testing and web application security workflows in a controlled, isolated network. Every lab here documents what I found, what broke, and what I learned across Metasploitable 2 and DVWA.
+I built this lab environment to practice penetration testing and web application security workflows in a controlled, isolated network. Every lab here documents what I found, what broke, and what I learned across Metasploitable 2, DVWA, and WebGoat.
 
 > All activity was performed in an isolated lab environment for educational purposes.
 
@@ -17,6 +17,7 @@ I built this lab environment to practice penetration testing and web application
 | [vsFTPd 2.3.4 Backdoor](machines/metasploitable2/vsftpd-2.3.4-backdoor/README.md) | Metasploitable 2 | Metasploit — CVE-2011-2523 | Complete |
 | [DVWA Brute Force](web-apps/dvwa/dvwa-brute-force/README.md) | DVWA on Metasploitable 2 | Hydra — HTTP form brute-force | Complete |
 | [DVWA Reflected XSS](web-apps/dvwa/dvwa-reflected-xss/README.md) | DVWA on Metasploitable 2 | Reflected XSS — blacklist bypass | Complete |
+| [WebGoat SSRF](web-apps/webgoat/webgoat-ssrf/README.md) | WebGoat (Docker) | Burp Suite — SSRF parameter tampering | Complete |
 
 ---
 
@@ -74,6 +75,17 @@ A source-code-driven review of DVWA's Reflected XSS module across Low, Medium, a
 | ![Medium source code](web-apps/dvwa/dvwa-reflected-xss/screenshots/reflected-xss-medium-source-code.png) | Medium security source code using a case-sensitive blacklist. |
 | ![Medium successful XSS](web-apps/dvwa/dvwa-reflected-xss/screenshots/reflected-xss-medium-success.png) | Uppercase `<SCRIPT>` bypass resulting in JavaScript execution. |
 
+### WebGoat SSRF
+
+A Server-Side Request Forgery (SSRF) exercise using WebGoat (Docker) and Burp Suite. Task 1 demonstrated blind path manipulation — changing `tom.png` to `jerry.png` in the `url` parameter made the server fetch a different local resource. Task 2 escalated to full external URL control by pointing the server to `http://ifconfig.pro`, which returned its public IP. The server performed the outbound request with no validation on the target URL.
+
+[Full writeup →](web-apps/webgoat/webgoat-ssrf/README.md)
+
+| Evidence | Description |
+| --- | --- |
+| ![WebGoat SSRF Task 1](web-apps/webgoat/webgoat-ssrf/screenshots/01-webgoat-ssrf-task1.png) | Burp Suite intercept showing the `url` parameter change from `tom.png` to `jerry.png`. |
+| ![WebGoat SSRF Task 2](web-apps/webgoat/webgoat-ssrf/screenshots/02-webgoat-ssrf-task2.png) | External URL fetch to `http://ifconfig.pro` returning the server's public IP. |
+
 ---
 
 ## What I Learned
@@ -85,6 +97,7 @@ A source-code-driven review of DVWA's Reflected XSS module across Low, Medium, a
 - **`ForceExploit` bypasses a safety check, not a technical barrier.** It worked here because I had already confirmed the target was vulnerable. In a real engagement, dig deeper rather than force it.
 - **Wordlist size is a time budget.** 18.6 million entries at 2,188 tries/min is ~6 days. Start small, confirm syntax, then scale.
 - **Troubleshooting failures teaches more than clean successes.** The wrong-LHOST error, the stale port-6200 check, the redirect without a cookie — each of these forced me to understand what the tools were actually doing.
+- **Unvalidated URL parameters enable SSRF.** Changing a filename from `tom.png` to `jerry.png` is harmless, but replacing it with an external URL or internal metadata endpoint gives the attacker control of the server's request direction.
 
 ---
 
@@ -97,9 +110,11 @@ labs/
 │       ├── README.md
 │       └── vsftpd-2.3.4-backdoor/
 ├── web-apps/
-│   └── dvwa/
-│       ├── dvwa-brute-force/
-│       └── dvwa-reflected-xss/
+│   ├── dvwa/
+│   │   ├── dvwa-brute-force/
+│   │   └── dvwa-reflected-xss/
+│   └── webgoat/
+│       └── webgoat-ssrf/
 ├── .gitignore
 ├── LICENSE
 └── README.md
@@ -113,9 +128,10 @@ labs/
 |---|---|---|
 | Linux pentest workstation | Attacker | `192.168.122.1` |
 | Metasploitable 2 | Target | `192.168.122.229` |
+| WebGoat (Docker) | Target | `192.168.122.84:8080` |
 | Virtual network | Isolated NAT | `192.168.122.0/24` |
 
-**Tools:** Nmap, Zenmap, Metasploit Framework, Meterpreter, Hydra, Netcat, Firefox
+**Tools:** Nmap, Zenmap, Metasploit Framework, Meterpreter, Hydra, Burp Suite, Netcat, Firefox
 
 ---
 
@@ -128,6 +144,8 @@ labs/
 - [Firefox](https://www.mozilla.org/firefox/)
 - [Metasploitable 2](https://docs.rapid7.com/metasploit/metasploitable-2/)
 - [DVWA](https://github.com/digininja/DVWA)
+- [WebGoat](https://github.com/WebGoat/WebGoat)
+- [Burp Suite Community Edition](https://portswigger.net/burp/communitydownload)
 
 ---
 
