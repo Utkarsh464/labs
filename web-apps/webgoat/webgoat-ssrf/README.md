@@ -45,7 +45,7 @@ The application presents a button that sends a POST request to `/WebGoat/SSRF/ta
 
 ### Screenshot
 
-![WebGoat SSRF Task 1 — Burp Request & Response](webgoat-ssrf-task1.png)
+![WebGoat SSRF Task 1 — Burp Request & Response](screenshots/01-webgoat-ssrf-task1.png)
 
 **Key Takeaway:** The server blindly fetches whatever path is passed in the `url` parameter. By changing `tom.png` to `jerry.png`, we made the server fetch a different image from the same directory — a simple but effective demonstration of SSRF.
 
@@ -82,7 +82,7 @@ The server fetched `http://ifconfig.pro` and returned its content, which include
 
 ### Screenshot
 
-![WebGoat SSRF Task 2 — Burp Request & Response](webgoat-ssrf-task2.png)
+![WebGoat SSRF Task 2 — Burp Request & Response](screenshots/02-webgoat-ssrf-task2.png)
 
 **Key Takeaway:** The server made an outbound HTTP request to an arbitrary external URL on our behalf. An attacker could use this technique to:
 - Scan internal networks behind firewalls
