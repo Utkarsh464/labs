@@ -1,7 +1,7 @@
 # Security Labs
 
 [![License](https://img.shields.io/github/license/Utkarsh464/labs)](LICENSE)
-[![Labs](https://img.shields.io/badge/labs-4-blue)](#lab-index)
+[![Labs](https://img.shields.io/badge/labs-6-blue)](#lab-index)
 [![Target](https://img.shields.io/badge/target-Metasploitable%202%20%7C%20WebGoat-critical)](machines/metasploitable2/)
 
 I built this lab environment to practice penetration testing and web application security workflows in a controlled, isolated network. Every lab here documents what I found, what broke, and what I learned across Metasploitable 2, DVWA, and WebGoat.
@@ -15,6 +15,8 @@ I built this lab environment to practice penetration testing and web application
 | Lab | Target | Technique | Status |
 | --- | --- | --- | --- |
 | [vsFTPd 2.3.4 Backdoor](machines/metasploitable2/vsftpd-2.3.4-backdoor/README.md) | Metasploitable 2 | Metasploit — CVE-2011-2523 | Complete |
+| [SSH Login Brute-Force](machines/metasploitable2/ssh-login-bruteforce-msfadmin/README.md) | Metasploitable 2 | Metasploit — ssh_login auxiliary | Complete |
+| [Telnet Login Brute-Force](machines/metasploitable2/telnet-login-bruteforce-msfadmin/README.md) | Metasploitable 2 | Metasploit — telnet_login auxiliary | Complete |
 | [DVWA Brute Force](web-apps/dvwa/dvwa-brute-force/README.md) | DVWA on Metasploitable 2 | Hydra — HTTP form brute-force | Complete |
 | [DVWA Reflected XSS](web-apps/dvwa/dvwa-reflected-xss/README.md) | DVWA on Metasploitable 2 | Reflected XSS — blacklist bypass | Complete |
 | [WebGoat SSRF](web-apps/webgoat/webgoat-ssrf/README.md) | WebGoat (Docker) | Burp Suite — SSRF parameter tampering | Complete |
@@ -75,6 +77,27 @@ A source-code-driven review of DVWA's Reflected XSS module across Low, Medium, a
 | ![Medium source code](web-apps/dvwa/dvwa-reflected-xss/screenshots/reflected-xss-medium-source-code.png) | Medium security source code using a case-sensitive blacklist. |
 | ![Medium successful XSS](web-apps/dvwa/dvwa-reflected-xss/screenshots/reflected-xss-medium-success.png) | Uppercase `<SCRIPT>` bypass resulting in JavaScript execution. |
 
+### SSH Login Brute-Force
+
+Used Metasploit's `ssh_login` auxiliary module with a targeted wordlist against Metasploitable 2. The module immediately found `msfadmin:msfadmin` — default credentials that should have been changed. Modern OpenSSH clients failed to connect due to disabled legacy host key algorithms, but Metasploit's built-in SSH client handled compatibility transparently. The session confirmed user-level access as `msfadmin`.
+
+[Full writeup →](machines/metasploitable2/ssh-login-bruteforce-msfadmin/README.md)
+
+| Evidence | Description |
+| --- | --- |
+| ![Metasploit ssh_login success](machines/metasploitable2/ssh-login-bruteforce-msfadmin/screenshots/01-msfconsole-ssh-login-success.png) | Metasploit console showing configured module and successful `msfadmin:msfadmin` discovery. |
+
+### Telnet Login Brute-Force
+
+Used Metasploit's `telnet_login` auxiliary module with separate username and password wordlists. Unlike `ssh_login` which uses paired `USERPASS_FILE`, `telnet_login` brute-forces every combination of `USER_FILE` × `PASS_FILE` — a cartesian product strategy. The same `msfadmin:msfadmin` credential worked here too, demonstrating credential reuse across services.
+
+[Full writeup →](machines/metasploitable2/telnet-login-bruteforce-msfadmin/README.md)
+
+| Evidence | Description |
+| --- | --- |
+| ![Telnet module configuration](machines/metasploitable2/telnet-login-bruteforce-msfadmin/screenshots/01-telnet-login-module-options.png) | Module search, options, and wordlist configuration. |
+| ![Telnet login success](machines/metasploitable2/telnet-login-bruteforce-msfadmin/screenshots/02-telnet-login-success.png) | Successful login and `whoami` validation. |
+
 ### WebGoat SSRF
 
 A Server-Side Request Forgery (SSRF) exercise using WebGoat (Docker) and Burp Suite. Task 1 demonstrated blind path manipulation — changing `tom.png` to `jerry.png` in the `url` parameter made the server fetch a different local resource. Task 2 escalated to full external URL control by pointing the server to `http://ifconfig.pro`, which returned its public IP. The server performed the outbound request with no validation on the target URL.
@@ -98,6 +121,9 @@ A Server-Side Request Forgery (SSRF) exercise using WebGoat (Docker) and Burp Su
 - **Wordlist size is a time budget.** 18.6 million entries at 2,188 tries/min is ~6 days. Start small, confirm syntax, then scale.
 - **Troubleshooting failures teaches more than clean successes.** The wrong-LHOST error, the stale port-6200 check, the redirect without a cookie — each of these forced me to understand what the tools were actually doing.
 - **Unvalidated URL parameters enable SSRF.** Changing a filename from `tom.png` to `jerry.png` is harmless, but replacing it with an external URL or internal metadata endpoint gives the attacker control of the server's request direction.
+- **Metasploit handles protocol compatibility better than CLI tools.** Modern OpenSSH rejects legacy host key algorithms (`ssh-rsa`, `ssh-dss`), but Metasploit's built-in SSH client connects to old servers without issue.
+- **`ssh_login` and `telnet_login` use different brute-force strategies.** The former uses paired `USERPASS_FILE` entries; the latter tries every combination of `USER_FILE` × `PASS_FILE`. Wordlist strategy must match the module.
+- **Credential reuse magnifies impact.** The same `msfadmin:msfadmin` works across SSH, Telnet, and system console on Metasploitable 2. One weak password compromises multiple services.
 
 ---
 
@@ -108,7 +134,9 @@ labs/
 ├── machines/
 │   └── metasploitable2/
 │       ├── README.md
-│       └── vsftpd-2.3.4-backdoor/
+│       ├── vsftpd-2.3.4-backdoor/
+│       ├── ssh-login-bruteforce-msfadmin/
+│       └── telnet-login-bruteforce-msfadmin/
 ├── web-apps/
 │   ├── dvwa/
 │   │   ├── dvwa-brute-force/
@@ -131,7 +159,7 @@ labs/
 | WebGoat (Docker) | Target | `192.168.122.84:8080` |
 | Virtual network | Isolated NAT | `192.168.122.0/24` |
 
-**Tools:** Nmap, Zenmap, Metasploit Framework, Meterpreter, Hydra, Burp Suite, Netcat, Firefox
+**Tools:** Nmap, Zenmap, Metasploit Framework, Meterpreter, Hydra, Burp Suite, Netcat, Firefox, John the Ripper
 
 ---
 
