@@ -9,7 +9,7 @@ Nmap `-A` against `192.168.122.229`: FTP (vsftpd 2.3.4), SSH (OpenSSH 4.7p1), Te
 ## Vulnerabilities Found
 
 | Service | Lab | Vulnerability |
-|---|---|---|---|
+|---|---|---|
 | vsftpd 2.3.4 | [vsFTPd Backdoor](vsftpd-2.3.4-backdoor/) | CVE-2011-2523 — supply-chain backdoor |
 | SSH | [SSH Login Brute-Force](ssh-login-bruteforce-msfadmin/) | Default credentials — msfadmin:msfadmin |
 | Telnet | [Telnet Login Brute-Force](telnet-login-bruteforce-msfadmin/) | Default credentials — msfadmin:msfadmin |
