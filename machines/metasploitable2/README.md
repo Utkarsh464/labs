@@ -9,10 +9,11 @@ Nmap `-A` against `192.168.122.229`: FTP (vsftpd 2.3.4), SSH (OpenSSH 4.7p1), Te
 ## Vulnerabilities Found
 
 | Service | Lab | Vulnerability |
-|---|---|---|
+|---|---|---|---|
 | vsftpd 2.3.4 | [vsFTPd Backdoor](vsftpd-2.3.4-backdoor/) | CVE-2011-2523 — supply-chain backdoor |
 | SSH | [SSH Login Brute-Force](ssh-login-bruteforce-msfadmin/) | Default credentials — msfadmin:msfadmin |
 | Telnet | [Telnet Login Brute-Force](telnet-login-bruteforce-msfadmin/) | Default credentials — msfadmin:msfadmin |
+| HTTP (Apache/PHP) | [PHP CGI Arg Injection](php-cgi-arg-injection-www-data/) | CVE-2012-1823 — PHP CGI argument injection |
 
 ## What I Learned
 
@@ -31,6 +32,7 @@ Nmap `-A` against `192.168.122.229`: FTP (vsftpd 2.3.4), SSH (OpenSSH 4.7p1), Te
 | [vsFTPd 2.3.4 Backdoor](vsftpd-2.3.4-backdoor/) | FTP | CVE-2011-2523 | Complete |
 | [SSH Login Brute-Force](ssh-login-bruteforce-msfadmin/) | SSH | Default credentials | Complete |
 | [Telnet Login Brute-Force](telnet-login-bruteforce-msfadmin/) | Telnet | Default credentials | Complete |
+| [PHP CGI Arg Injection](php-cgi-arg-injection-www-data/) | HTTP (Apache/PHP) | CVE-2012-1823 | Complete |
 
 ## Safety Boundary
 
