@@ -40,6 +40,7 @@ Nmap `-A` against `192.168.122.229`:
 | [Telnet Login Brute-Force](telnet-login-bruteforce-msfadmin/) | Telnet | Default credentials | Complete |
 | [PHP CGI Arg Injection](php-cgi-arg-injection-www-data/) | HTTP (Apache/PHP) | CVE-2012-1823 | Complete |
 | [Samba Usermap Script](samba-usermap-script-root/) | SMB | CVE-2007-2447 | Complete |
+| [UnrealIRCd Backdoor](unrealircd-backdoor-root/) | IRC | CVE-2010-2075 | Complete |
 
 ## What I Learned
 
@@ -55,7 +56,10 @@ Nmap `-A` against `192.168.122.229`:
 - The `php/meterpreter/reverse_tcp` payload does not include a full Meterpreter command set — dropping to `shell` is the expected way to run system commands.
 - SMB version alone (Samba 3.0.20-Debian) was enough to identify CVE-2007-2447 — the `smb-os-discovery` Nmap script provides the exact version string needed.
 - The Samba usermap_script exploit requires no authentication; any anonymous SMB connection can trigger code execution.
-- Having multiple root-level exploit paths on one host (vsftpd, Samba) reinforces that defense-in-depth is necessary — patching one service is not enough.
+- Having multiple root-level exploit paths on one host (vsftpd, Samba, UnrealIRCd) reinforces that defense-in-depth is necessary — patching one service is not enough.
+- The UnrealIRCd backdoor (CVE-2010-2075) is a supply-chain attack, same class as vsftpd 2.3.4 — both came from compromised source archives, not code flaws.
+- The `check` command in Metasploit is valuable: it registered a test IRC user and verified the backdoor was present before sending the payload.
+- Network interface selection matters — `192.168.122.1` (virbr0) was on the same VM bridge, while `192.168.29.176` (wlo1) was on a NAT'd host network.
 
 ## Safety Boundary
 
