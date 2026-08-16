@@ -1,7 +1,7 @@
 # Security Labs
 
 [![License](https://img.shields.io/github/license/Utkarsh464/labs)](LICENSE)
-[![Labs](https://img.shields.io/badge/labs-6-blue)](#lab-index)
+[![Labs](https://img.shields.io/badge/labs-7-blue)](#lab-index)
 [![Target](https://img.shields.io/badge/target-Metasploitable%202%20%7C%20WebGoat-critical)](machines/metasploitable2/)
 
 Penetration testing labs conducted in an isolated virtual network. Every lab documents the full workflow — recon, exploitation, troubleshooting, and remediation — against intentionally vulnerable targets.
@@ -12,26 +12,27 @@ Penetration testing labs conducted in an isolated virtual network. Every lab doc
 
 ## Lab Index
 
-| Lab | Target | Technique | Status |
-| --- | --- | --- | --- |
-| [vsFTPd 2.3.4 Backdoor](machines/metasploitable2/vsftpd-2.3.4-backdoor/README.md) | Metasploitable 2 | Metasploit — CVE-2011-2523 | Complete |
-| [SSH Login Brute-Force](machines/metasploitable2/ssh-login-bruteforce-msfadmin/README.md) | Metasploitable 2 | Metasploit — ssh_login auxiliary | Complete |
-| [Telnet Login Brute-Force](machines/metasploitable2/telnet-login-bruteforce-msfadmin/README.md) | Metasploitable 2 | Metasploit — telnet_login auxiliary | Complete |
-| [DVWA Brute Force](web-apps/dvwa/dvwa-brute-force/README.md) | DVWA on Metasploitable 2 | Hydra — HTTP form brute-force | Complete |
-| [DVWA Reflected XSS](web-apps/dvwa/dvwa-reflected-xss/README.md) | DVWA on Metasploitable 2 | Reflected XSS — blacklist bypass | Complete |
-| [WebGoat SSRF](web-apps/webgoat/webgoat-ssrf/README.md) | WebGoat (Docker) | Burp Suite — SSRF parameter tampering | Complete |
+| Lab                                                                                             | Target                   | Technique                                                  | Status   |
+| ----------------------------------------------------------------------------------------------- | ------------------------ | ---------------------------------------------------------- | -------- |
+| [vsFTPd 2.3.4 Backdoor](machines/metasploitable2/vsftpd-2.3.4-backdoor/README.md)               | Metasploitable 2         | Metasploit — CVE-2011-2523                                 | Complete |
+| [SSH Login Brute-Force](machines/metasploitable2/ssh-login-bruteforce-msfadmin/README.md)       | Metasploitable 2         | Metasploit — ssh_login auxiliary                           | Complete |
+| [Telnet Login Brute-Force](machines/metasploitable2/telnet-login-bruteforce-msfadmin/README.md) | Metasploitable 2         | Metasploit — telnet_login auxiliary                        | Complete |
+| [DVWA Brute Force](web-apps/dvwa/dvwa-brute-force/README.md)                                    | DVWA on Metasploitable 2 | Hydra — HTTP form brute-force                              | Complete |
+| [DVWA Reflected XSS](web-apps/dvwa/dvwa-reflected-xss/README.md)                                | DVWA on Metasploitable 2 | Reflected XSS — blacklist bypass                           | Complete |
+| [WebGoat SSRF](web-apps/webgoat/webgoat-ssrf/README.md)                                         | WebGoat (Docker)         | Burp Suite — SSRF parameter tampering                      | Complete |
+| [dir-brute Directory Enumeration](web-apps/dir-brute/README.md)                                 | Local test server        | Custom Python brute-forcer — status filtering, save, crawl | Complete |
 
 ---
 
 ## Methodology
 
-| Phase | Approach |
-|---|---|
-| **Reconnaissance** | Nmap service discovery, port scanning, OS fingerprinting. Identify every open port and banner before selecting a target. |
-| **Enumeration** | Version-to-CVE mapping. Research service versions, review exploit behavior, identify prerequisites — LHOST reachability, session cookies, module quirks. |
-| **Exploitation** | Configure and run the exploit. When it breaks — and it will — troubleshoot methodically: verify the network path, check module options, read the error output. |
-| **Post-Exploitation** | Validate access level (`whoami`, `id`, `uname -a`), navigate the filesystem, capture evidence. |
-| **Remediation** | Map findings to actionable controls: version upgrades, configuration hardening, network segmentation, detection rules. |
+| Phase                 | Approach                                                                                                                                                       |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Reconnaissance**    | Nmap service discovery, port scanning, OS fingerprinting. Identify every open port and banner before selecting a target.                                       |
+| **Enumeration**       | Version-to-CVE mapping. Research service versions, review exploit behavior, identify prerequisites — LHOST reachability, session cookies, module quirks.       |
+| **Exploitation**      | Configure and run the exploit. When it breaks — and it will — troubleshoot methodically: verify the network path, check module options, read the error output. |
+| **Post-Exploitation** | Validate access level (`whoami`, `id`, `uname -a`), navigate the filesystem, capture evidence.                                                                 |
+| **Remediation**       | Map findings to actionable controls: version upgrades, configuration hardening, network segmentation, detection rules.                                         |
 
 ---
 
@@ -51,12 +52,12 @@ Penetration testing labs conducted in an isolated virtual network. Every lab doc
 
 ## Lab Topology
 
-| Node | Role | Address |
-|---|---|---|
-| Linux pentest workstation | Attacker | `192.168.122.1` |
-| Metasploitable 2 | Target | `192.168.122.229` |
-| WebGoat (Docker) | Target | `192.168.122.84:8080` |
-| Virtual network | Isolated NAT | `192.168.122.0/24` |
+| Node                      | Role         | Address               |
+| ------------------------- | ------------ | --------------------- |
+| Linux pentest workstation | Attacker     | `192.168.122.1`       |
+| Metasploitable 2          | Target       | `192.168.122.229`     |
+| WebGoat (Docker)          | Target       | `192.168.122.84:8080` |
+| Virtual network           | Isolated NAT | `192.168.122.0/24`    |
 
 **Tools:** Nmap, Zenmap, Metasploit Framework, Hydra, Burp Suite, Netcat, Firefox
 
