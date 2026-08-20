@@ -1,7 +1,7 @@
 # Security Labs
 
 [![License](https://img.shields.io/github/license/Utkarsh464/labs)](LICENSE)
-[![Labs](https://img.shields.io/badge/labs-7-blue)](#lab-index)
+[![Labs](https://img.shields.io/badge/labs-10-blue)](#lab-index)
 [![Target](https://img.shields.io/badge/target-Metasploitable%202%20%7C%20WebGoat-critical)](machines/metasploitable2/)
 
 Penetration testing labs conducted in an isolated virtual network. Every lab documents the full workflow — recon, exploitation, troubleshooting, and remediation — against intentionally vulnerable targets.
@@ -17,6 +17,9 @@ Penetration testing labs conducted in an isolated virtual network. Every lab doc
 | [vsFTPd 2.3.4 Backdoor](machines/metasploitable2/vsftpd-2.3.4-backdoor/README.md)               | Metasploitable 2         | Metasploit — CVE-2011-2523                                 | Complete |
 | [SSH Login Brute-Force](machines/metasploitable2/ssh-login-bruteforce-msfadmin/README.md)       | Metasploitable 2         | Metasploit — ssh_login auxiliary                           | Complete |
 | [Telnet Login Brute-Force](machines/metasploitable2/telnet-login-bruteforce-msfadmin/README.md) | Metasploitable 2         | Metasploit — telnet_login auxiliary                        | Complete |
+| [PHP CGI Argument Injection](machines/metasploitable2/php-cgi-arg-injection-www-data/README.md) | Metasploitable 2         | Metasploit — CVE-2012-1823 (www-data)                      | Complete |
+| [Samba usermap_script Execution](machines/metasploitable2/samba-usermap-script-root/README.md)  | Metasploitable 2         | Metasploit — CVE-2007-2447 (root)                          | Complete |
+| [UnrealIRCd Backdoor](machines/metasploitable2/unrealircd-backdoor-root/README.md)              | Metasploitable 2         | Metasploit — CVE-2010-2075 (root)                          | Complete |
 | [DVWA Brute Force](web-apps/dvwa/dvwa-brute-force/README.md)                                    | DVWA on Metasploitable 2 | Hydra — HTTP form brute-force                              | Complete |
 | [DVWA Reflected XSS](web-apps/dvwa/dvwa-reflected-xss/README.md)                                | DVWA on Metasploitable 2 | Reflected XSS — blacklist bypass                           | Complete |
 | [WebGoat SSRF](web-apps/webgoat/webgoat-ssrf/README.md)                                         | WebGoat (Docker)         | Burp Suite — SSRF parameter tampering                      | Complete |
@@ -72,13 +75,17 @@ labs/
 │       ├── README.md
 │       ├── vsftpd-2.3.4-backdoor/
 │       ├── ssh-login-bruteforce-msfadmin/
-│       └── telnet-login-bruteforce-msfadmin/
+│       ├── telnet-login-bruteforce-msfadmin/
+│       ├── php-cgi-arg-injection-www-data/
+│       ├── samba-usermap-script-root/
+│       └── unrealircd-backdoor-root/
 ├── web-apps/
 │   ├── dvwa/
 │   │   ├── dvwa-brute-force/
 │   │   └── dvwa-reflected-xss/
-│   └── webgoat/
-│       └── webgoat-ssrf/
+│   ├── webgoat/
+│   │   └── webgoat-ssrf/
+│   └── dir-brute/
 ├── .gitignore
 ├── LICENSE
 └── README.md
