@@ -1,7 +1,7 @@
 # Security Labs
 
 [![License](https://img.shields.io/github/license/Utkarsh464/labs)](LICENSE)
-[![Labs](https://img.shields.io/badge/labs-11-blue)](#lab-index)
+[![Labs](https://img.shields.io/badge/labs-12-blue)](#lab-index)
 [![Target](https://img.shields.io/badge/target-Metasploitable%202%20%7C%20WebGoat-critical)](machines/metasploitable2/)
 
 Penetration testing labs conducted in an isolated virtual network. Every lab documents the full workflow — recon, exploitation, troubleshooting, and remediation — against intentionally vulnerable targets.
@@ -20,6 +20,7 @@ Penetration testing labs conducted in an isolated virtual network. Every lab doc
 | [PHP CGI Argument Injection](machines/metasploitable2/php-cgi-arg-injection-www-data/README.md) | Metasploitable 2         | Metasploit — CVE-2012-1823 (www-data)                       | Complete |
 | [Samba usermap_script Execution](machines/metasploitable2/samba-usermap-script-root/README.md)  | Metasploitable 2         | Metasploit — CVE-2007-2447 (root)                           | Complete |
 | [UnrealIRCd Backdoor](machines/metasploitable2/unrealircd-backdoor-root/README.md)              | Metasploitable 2         | Metasploit — CVE-2010-2075 (root)                           | Complete |
+| [SMTP User Enumeration](machines/metasploitable2/smtp-user-enumeration/README.md)               | Metasploitable 2         | Metasploit — smtp_enum auxiliary                            | Complete |
 | [DVWA Brute Force](web-apps/dvwa/dvwa-brute-force/README.md)                                    | DVWA on Metasploitable 2 | Hydra — HTTP form brute-force                               | Complete |
 | [DVWA Reflected XSS](web-apps/dvwa/dvwa-reflected-xss/README.md)                                | DVWA on Metasploitable 2 | Reflected XSS — blacklist bypass                            | Complete |
 | [DVWA Command Execution](web-apps/dvwa/dvwa-command-execution/README.md)                        | DVWA on Metasploitable 2 | Command injection — incomplete blacklist (`\|` pipe bypass) | Complete |
@@ -52,6 +53,7 @@ Penetration testing labs conducted in an isolated virtual network. Every lab doc
 - **`ssh_login` and `telnet_login` use different brute-force strategies.** The former uses paired `USERPASS_FILE` entries; the latter tries every combination of `USER_FILE` × `PASS_FILE`. Wordlist strategy must match the module.
 - **Credential reuse magnifies impact.** The same `msfadmin:msfadmin` works across SSH, Telnet, and system console — one weak password compromises multiple services.
 - **Unvalidated URL parameters enable SSRF.** Replacing a filename with an external URL or internal metadata endpoint gives the attacker control of the server's request direction.
+- **SMTP `VRFY` enumeration exposes the account inventory.** Even without cracking passwords, valid usernames on port 25 feed later brute-force phases against SSH, FTP, and Telnet on the same host.
 
 ---
 
@@ -80,7 +82,8 @@ labs/
 │       ├── telnet-login-bruteforce-msfadmin/
 │       ├── php-cgi-arg-injection-www-data/
 │       ├── samba-usermap-script-root/
-│       └── unrealircd-backdoor-root/
+│       ├── unrealircd-backdoor-root/
+│       └── smtp-user-enumeration/
 ├── web-apps/
 │   ├── dvwa/
 │   │   ├── dvwa-brute-force/
