@@ -25,8 +25,9 @@ The objective was to understand how DVWA's command execution handling changes ac
 | Field                      | Detail                                 |
 | -------------------------- | -------------------------------------- |
 | **Target Application**     | Damn Vulnerable Web Application (DVWA) |
-| **Target Host**            | Metasploitable 2                       |
-| **Browser Used**           | Firefox                                |
+| **Target Host** | Metasploitable 2 |
+| **Target Address** | `http://192.168.122.229/` — HTTP/DVWA on port 80 |
+| **Browser Used** | Firefox |
 | **Security Levels Tested** | Low, Medium                            |
 | **Lab Network**            | Local isolated VM environment          |
 | **Vulnerability Type**     | OS Command Injection                   |
