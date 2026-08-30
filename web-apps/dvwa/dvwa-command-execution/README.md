@@ -1,6 +1,6 @@
 # DVWA - OS Command Execution (Command Injection)
 
-This lab documents OS command injection in the Damn Vulnerable Web Application (DVWA) Command Execution module running on Metasploitable 2, at the Medium security level. The activity was performed in an isolated virtual lab environment for educational purposes.
+This lab documents OS command injection in the Damn Vulnerable Web Application (DVWA) Command Execution module running on Metasploitable 2. It compares the Low and Medium security levels: Low performs no filtering, while Medium adds an incomplete blacklist that is easy to bypass. The activity was performed in an isolated virtual lab environment for educational purposes.
 
 ---
 
@@ -16,26 +16,56 @@ The severity depends on which user the web server runs as. In this lab the injec
 
 ## Lab Objective
 
-The objective was to understand how the Medium security level tries to block command injection with a blacklist, why that blacklist is incomplete, and to validate command execution by running a simple command and confirming the result.
+The objective was to understand how DVWA's command execution handling changes across security levels, compare a completely unprotected low level with a blacklist-protected medium level, and validate command execution on each by running a simple command and confirming the result.
 
 ---
 
 ## Environment
 
-| Field                     | Detail                                 |
-| ------------------------- | -------------------------------------- |
-| **Target Application**    | Damn Vulnerable Web Application (DVWA) |
-| **Target Host**           | Metasploitable 2                       |
-| **Browser Used**          | Firefox                                |
-| **Security Level Tested** | Medium                                 |
-| **Lab Network**           | Local isolated VM environment          |
-| **Vulnerability Type**    | OS Command Injection                   |
+| Field                      | Detail                                 |
+| -------------------------- | -------------------------------------- |
+| **Target Application**     | Damn Vulnerable Web Application (DVWA) |
+| **Target Host**            | Metasploitable 2                       |
+| **Browser Used**           | Firefox                                |
+| **Security Levels Tested** | Low, Medium                            |
+| **Lab Network**            | Local isolated VM environment          |
+| **Vulnerability Type**     | OS Command Injection                   |
 
 ---
 
 ## Source Code Analysis
 
-DVWA reads the submitted value from `$_REQUEST['ip']` and passes it straight into `shell_exec()`:
+DVWA reads the submitted value from `$_REQUEST['ip']` and passes it straight into `shell_exec()`. The two security levels differ only in how they handle input before it reaches the shell.
+
+### Low
+
+```php
+<?php
+
+if( isset( $_POST[ 'submit' ] ) ) {
+
+    $target = $_REQUEST[ 'ip' ];
+
+    // Determine OS and execute the ping command.
+    if (stristr(php_uname('s'), 'Windows NT')) {
+
+        $cmd = shell_exec( 'ping  ' . $target );
+        echo '<pre>'.$cmd.'</pre>';
+
+    } else {
+
+        $cmd = shell_exec( 'ping  -c 3 ' . $target );
+        echo '<pre>'.$cmd.'</pre>';
+
+    }
+
+}
+?>
+```
+
+At the Low security level there is no validation, no sanitization, and no blacklist. The submitted value is concatenated directly into `shell_exec('ping  -c 3 ' . $target)`. Because `shell_exec` invokes a shell, every character in `$target` is honored as shell syntax, so any command separator or chaining operator works.
+
+### Medium
 
 ```php
 <?php
@@ -69,14 +99,6 @@ if( isset( $_POST[ 'submit'] ) ) {
 ?>
 ```
 
-The key line is:
-
-```php
-$cmd = shell_exec( 'ping  -c 3 ' . $target );
-```
-
-`$target` is concatenated directly into the shell command. Nothing is escaping user input, so any shell metacharacter an attacker supplies is interpreted by the shell. This is the injection point.
-
 The Medium level attempts to defend the module with a blacklist:
 
 ```php
@@ -91,7 +113,7 @@ $substitutions = array(
 - `127.0.0.1 && whoami` becomes `127.0.0.1  whoami` (the `&&` is stripped, so the payload breaks).
 - `127.0.0.1 ; whoami` becomes `127.0.0.1  whoami` (the `;` is stripped, so the payload breaks).
 
-### Why the blacklist is insufficient
+#### Why the blacklist is insufficient
 
 Blacklist filtering only fails safely if it blocks every representation an attacker can use. This blacklist removes exactly two separators (`&&` and `;`) but leaves the pipe operator `|` untouched. Because only these two strings are removed, a payload that does not contain them passes through unchanged.
 
@@ -99,9 +121,37 @@ The pipe operator is a valid shell metacharacter: `command1 | command2` sends th
 
 ---
 
-## Exploitation
+## Low Security Demonstration
 
-The IP field was given the following input:
+Because the Low level applies no filtering, a standard separator such as `;` works directly. The IP field was given the following input:
+
+```
+<target> ; whoami
+```
+
+The command the server executes becomes:
+
+```
+ping -c 3 <target> ; whoami
+```
+
+The `;` chains `whoami` after the `ping` command, regardless of whether the ping succeeds. The response displayed the `whoami` output:
+
+```
+www-data
+```
+
+This confirms arbitrary command execution as the `www-data` user at the Low security level, with no input protection at all.
+
+![Low Command Execution](screenshots/command-execution-low.png)
+
+_Figure 1: Low Command Execution — The DVWA Command Execution module at Low shows the unfiltered source (no blacklist) and the result of the injected command, which printed `www-data`._
+
+---
+
+## Medium Security Demonstration
+
+At the Medium level, `;` and `&&` are stripped by the blacklist, so a semicolon-based payload is broken. The IP field was therefore given the following input, using the pipe operator which is not filtered:
 
 ```
 127.0.0.1 | whoami
@@ -113,19 +163,15 @@ The IP field was given the following input:
 ping -c 3 127.0.0.1 | whoami
 ```
 
-`ping` runs against the loopback address, and its output is piped to `whoami`. Because the payload did not use a blacklisted separator, the pipe was not stripped and the command injection succeeded.
-
-The response displayed the `whoami` output:
+`ping` runs against the loopback address, and its output is piped to `whoami`. Because the payload did not use a blacklisted separator, the pipe was not stripped and the command injection succeeded. The response displayed:
 
 ```
 www-data
 ```
 
-This confirms arbitrary command execution as the `www-data` user — the account the web server runs as.
-
 ![Command Execution Medium Pipe Bypass](screenshots/command-execution-medium-pipe-bypass.png)
 
-_Figure 1: Medium Command Execution — The DVWA Command Execution module shows the blacklist source (only `&&` and `;` removed) and the result of `127.0.0.1 | whoami`, which printed `www-data`._
+_Figure 2: Medium Command Execution — The DVWA Command Execution module shows the blacklist source (only `&&` and `;` removed) and the result of `127.0.0.1 | whoami`, which printed `www-data`._
 
 ---
 
@@ -133,7 +179,7 @@ _Figure 1: Medium Command Execution — The DVWA Command Execution module shows 
 
 The vulnerability exists because the application concatenates user-controlled input directly into a shell command built with `shell_exec()`. The input is never treated as data — every character becomes part of the command line, so shell metacharacters are honored.
 
-The Medium defense is an incomplete blacklist that removes only `&&` and `;`. Blacklist filtering cannot fully mitigate command injection because there are many equivalent ways to chain commands in a shell. Here, the pipe operator `|` was not filtered and provided the bypass.
+At the Low level there is no defense at all, so any separator works. At the Medium level the defense is an incomplete blacklist that removes only `&&` and `;`. Blacklist filtering cannot fully mitigate command injection because there are many equivalent ways to chain commands in a shell. Here, the pipe operator `|` was not filtered and provided the bypass.
 
 ---
 
@@ -167,6 +213,7 @@ Realistic consequences include:
 ## Lessons Learned
 
 - Concatenating user input into `shell_exec()` is command injection; `shell_exec` invokes a shell, so shell metacharacters are honored.
+- The Low level performs no filtering, so `;`, `&&`, `|`, and other separators all work.
 - The Medium level removes only `&&` and `;`. A payload using `|` bypasses the filter because the pipe is not blacklisted.
 - Blacklist filtering is unreliable for command injection because attackers can choose from many equivalent separators and techniques.
 - Allow-listing input and escaping shell arguments are far stronger protections than trying to predict and remove dangerous strings.
