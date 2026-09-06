@@ -24,3 +24,7 @@ workspace/
 # Environment files
 .env
 .env.*
+
+# Lab flag/scratch files
+user.txt
+root.txt
