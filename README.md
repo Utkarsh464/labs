@@ -10,6 +10,10 @@ Penetration testing labs conducted in an isolated virtual network. Every lab doc
 
 ---
 
+## CVE index
+
+A list of CVEs I've exploited with full advisory details: [exploited-cves](exploited-cves/README.md).
+
 ## Lab Index
 
 | Lab                                                                                             | Target                   | Technique                                                   | Status   |
